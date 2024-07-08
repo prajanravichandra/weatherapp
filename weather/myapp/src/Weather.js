@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import './weather.css';
 import axios from 'axios';
+import { Info } from './Info';
 import { 
   WiDayThunderstorm, WiSprinkle, WiRain, WiSnow, WiSmoke, 
   WiDayHaze, WiDust, WiFog, WiSandstorm, WiVolcano, WiStrongWind, 
   WiTornado, WiDaySunny, WiCloud 
 } from 'react-icons/wi';
-
-import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const weatherIcons = {
   Thunderstorm: <WiDayThunderstorm size={'100px'} className="icon" />,
@@ -30,26 +28,25 @@ const weatherIcons = {
 
 const Weather = () => {
   const [city, setCity] = useState('');
-  const [weather, setWeather] = useState(null);
-  const [found, setFound] = useState(true);
+  const [weatherData, setWeatherData] = useState(null);
   const [toggle, setToggle] = useState(true);
-  const [tem, setTem] = useState(0);
 
   const fetchWeather = async () => {
-    const apiKey = 'e5f5ad450f23df32cacdadf6971f6ab7';
+    const apiKey = process.REACT_APP_API_KEY;
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
     try {
       const response = await axios.get(url);
-      setWeather(response.data);
-      setTem(response.data.main.temp);
-      setFound(true); 
+      setWeatherData({
+        ...response.data,
+        temp: response.data.main.temp
+      });
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setFound(false);
+        setWeatherData({ notFound: true });
       } else {
         console.error("Error fetching the weather data", error.message);
+        setWeatherData(null);
       }
-      setWeather(null);
     }
   };
 
@@ -80,35 +77,33 @@ const Weather = () => {
         <button type="submit" className="form_item">Get Weather</button>
       </form>
       <button type="button" onClick={handleToggle}>Convert</button>
-      {weather && (
-        <div>
-          <h3>Temperature in {weather.name}</h3>
-          {found ? (
+      {weatherData ? (
+        weatherData.notFound ? (
+          <div className="not-found">
+            <h1>NOT FOUND</h1>
+          </div>
+        ) : (
+          <div>
+            <h3>Temperature in {weatherData.name}</h3>
             <div className="info">
-              <div >
+              <div>
                 <b>Temperature:</b>
                 {toggle ? (
-                  <p>{tem} °C</p>
+                  <p>{weatherData.temp} °C</p>
                 ) : (
-                  <p>{(tem * 9/5) + 32} °F</p>
+                  <p>{(weatherData.temp * 9/5) + 32} °F</p>
                 )}
               </div>
-              <p><b>Country:</b><br /> {weather.sys.country}</p>
-              <p><b>Condition:</b><br /> {weather.weather[0].description}</p>
-              <p><b>Humidity:</b><br /> {weather.main.humidity} %</p>
-              <p><b>Pressure:</b><br /> {weather.main.pressure} hPa</p>
-              <p><b>Wind Speed:</b><br /> {weather.wind.speed} km/hr</p>
-              <div>
-              </div>
+              <Info name={"Country:"} param={weatherData.sys.country}></Info>
+              <Info name={"Condition:"} param={weatherData.weather[0].description}></Info>
+              <Info name={"Humidity:"} param={weatherData.main.humidity}></Info>
+              <Info name={"Pressure:"} param={weatherData.main.pressure}></Info>
+              <Info name={"Wind Speed:"} param={weatherData.wind.speed}></Info>
             </div>
-          ) : (
-            <div className="not-found">
-              <h1>NOT FOUND</h1>
-            </div>
-          )}
-          {weatherIcons[weather.weather[0].main]}
-        </div>
-      )}
+            {weatherIcons[weatherData.weather[0].main]}
+          </div>
+        )
+      ) : null}
     </div>
   );
 };
