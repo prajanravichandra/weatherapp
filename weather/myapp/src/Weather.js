@@ -32,7 +32,7 @@ const Weather = () => {
   const [toggle, setToggle] = useState(true);
 
   const fetchWeather = async () => {
-    const apiKey = process.REACT_APP_API_KEY;
+    const apiKey = process.API_KEY;
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
     try {
       const response = await axios.get(url);
