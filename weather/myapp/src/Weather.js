@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './weather.css';
 import axios from 'axios';
-import { Info } from './Info';
+import Info from './Info';
 import { 
   WiDayThunderstorm, WiSprinkle, WiRain, WiSnow, WiSmoke, 
   WiDayHaze, WiDust, WiFog, WiSandstorm, WiVolcano, WiStrongWind, 
@@ -86,19 +86,12 @@ const Weather = () => {
           <div>
             <h3>Temperature in {weatherData.name}</h3>
             <div className="info">
-              <div>
-                <b>Temperature:</b>
-                {toggle ? (
-                  <p>{weatherData.temp} °C</p>
-                ) : (
-                  <p>{(weatherData.temp * 9/5) + 32} °F</p>
-                )}
-              </div>
-              <Info name={"Country:"} param={weatherData.sys.country}></Info>
-              <Info name={"Condition:"} param={weatherData.weather[0].description}></Info>
-              <Info name={"Humidity:"} param={weatherData.main.humidity}></Info>
-              <Info name={"Pressure:"} param={weatherData.main.pressure}></Info>
-              <Info name={"Wind Speed:"} param={weatherData.wind.speed}></Info>
+              <Info name="Temperature:" param={toggle ? `${weatherData.temp} °C` : `${(weatherData.temp * 9/5) + 32} °F`} />
+              <Info name="Country:" param={weatherData.sys.country} />
+              <Info name="Condition:" param={weatherData.weather[0].description} />
+              <Info name="Humidity:" param={weatherData.main.humidity} />
+              <Info name="Pressure:" param={weatherData.main.pressure} />
+              <Info name="Wind Speed:" param={weatherData.wind.speed} />
             </div>
             {weatherIcons[weatherData.weather[0].main]}
           </div>
